@@ -1,0 +1,1093 @@
+swagger: '2.0'
+
+info:
+  version: 1.0.0
+  title: Management API
+
+host: dashboard.soundcast.fm
+basePath: /rest/v1
+schemes:
+  - https
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+
+
+definitions:
+  Status: &STATUS
+    type: integer
+    description: 0 disabled, 10 enabled, 30 deleted
+    enum: [0, 10, 30]
+  RollType: &ROLLTYPE
+    type: integer
+    description: 0 pre roll, -2 post roll
+    enum: [0, -2]
+  Account:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: account id
+      name:
+        type: string
+        description: account name
+      uuid:
+        type: string
+        description: account uuid
+      type:
+        type: string
+        description: account type
+      logo:
+        type: string
+        description: url of the account logo
+  Network:
+    type: object
+    properties:
+      id:
+        type: integer
+      uuid: 
+        type: string
+        description: network unique ID
+      name:
+        type: string
+        description: network name
+      domain:
+        type: string
+        description: main network domain
+      status: 
+        <<: *STATUS
+      sitesCount: 
+        type: integer
+        description: number of site under this network
+      account_id:
+        type: integer
+        description: id of the account owning the network
+      content_category:
+        $ref: '#/definitions/ContentCategories'
+      invoice_data_id:
+        type: integer
+        description: id for invoice (null)
+  NetworkInput:
+    type: object
+    properties:
+      name:
+        type: string
+        description: network name
+      domain:
+        type: string
+        description: main domain of the network
+      account_id:
+        type: integer
+        description: account owning the network
+      content_category_id:
+        type: integer
+        description: id of the content category can be find with the /content-categories path
+      status:
+        <<: *STATUS
+  Site:
+    type: object
+    properties:
+      id:
+        type: integer
+      uuid: 
+        type: string
+        description: site uniq ID
+      name:
+        type: string
+        description: site name
+      domain:
+        type: string
+        description: site domain
+      status: 
+        <<: *STATUS 
+      device_type: 
+        type: string
+        description: type of device serve by the site
+      network_id:
+        type: integer
+        description: network owning the site
+      content_category:
+        $ref: '#/definitions/ContentCategories'
+      sdkVersion:
+        type: string
+        description: deprecated
+  SiteInput:
+    type: object
+    properties:
+      name:
+        type: string
+        description: site name
+      domain:
+        type: string
+        description: site domain
+      status: 
+        <<: *STATUS 
+      device_type: 
+        type: string
+        description: type of device serve by the site
+      network_id:
+        type: integer
+        description: network owning the site
+      content_category_id:
+        type: integer
+        description: id of the content category can be find with the /content-categories path
+      sdkVersion:
+        type: string
+        description: deprecated
+  TagInput:
+    type: object
+    properties:
+      name:
+        type: string
+        description: name of the tag
+      roll_type:
+        <<: *ROLLTYPE
+      stitched:
+        type: integer
+        description: 1 when tag content is stich
+      floor_price:
+        type: string
+        description: floor price
+      min_duration:
+        type: integer
+        description: podcast minimum duration
+      max_duration:
+        type: integer
+        description: podcast maximum duration
+      min_bitrate:
+        type: integer
+        description: bitrate mimimun on the podcast
+      max_bitrate:
+        type: integer
+        description: bitrate maximun on the podcast
+      companion_ad: 
+        type: integer
+        description: not implemented yet
+      companion_ad_type:
+        type: string
+        description: not implemented yet
+      ad_size_ids:
+        type: array
+        description: not implemented, defines the companion ad emplacement
+        items: 
+          $ref: '#/definitions/AdSize'
+      mobile_optimized:
+        type: integer
+        description: is the tag optimized of mobile
+      tracking:
+        type: integer
+        enum: [0, 1, 2]
+        description: 2 to let soundcast fetch all traking, 1 to fetch impression tracking and let soundcast take care of completion, 0 to fetch all tracking by yourself 
+      stream:
+        type: integer
+        description: 1 when the flux is streaming
+      stream_url:
+        type: string
+        description: url of the stream
+      stream_format:
+        type: string
+        description: format of the stream (ex. mp3)
+      stream_bitrate:
+        type: string
+        description: stream bitrate
+      stream_sampling_frequency:
+        type: string
+        description: stream frequency
+      stream_encoding_profile:
+        type: string
+        description: encoding profile of the stream (ex, VBR)
+      extern_id:
+        type: string
+        description: tag id on your plateform
+      site_id:
+        type: integer
+        description: site id on which the tasg depends
+      status:
+        <<: *STATUS
+      content_category_id:
+        type: integer
+        description: id of the categorie
+  Tag:
+    type: object
+    properties:
+      name:
+        type: string
+        description: name of the tag
+      roll_type_label:
+        type: string
+        description: roll type label (ex. pre-roll)
+      stitched:
+        type: integer
+        enum: [0, 1]
+        description: 1 when tag content is stiched
+      floor_price:
+        type: string
+        description: floor price
+      min_duration:
+        type: integer
+        description: duration minimum
+      max_duration:
+        type: integer
+        description: duration maximum
+      min_bitrate:
+        type: integer
+        description: bitrate mimimun on the tag
+      max_bitrate:
+        type: integer
+        description: bitrate maximun on the tag
+      companion_ad: 
+        type: integer
+        description: not implemented yet
+      companion_ad_type:
+        type: string
+        description: not implemented yet
+      ad_size_ids:
+        type: array
+        description: not implemented, defines the companion ad emplacement
+        items: 
+          $ref: '#/definitions/AdSize'
+      mobile_optimized:
+        type: integer
+        description: is the tag optimized of mobile
+      tracking:
+        type: integer
+        enum: [2, 1, 0]
+        description: 2 to let soundcast fetch all traking, 1 to fetch impression tracking and let soundcast take care of completion, 0 to fetch all tracking by yourself 
+      stream:
+        type: integer
+        enum: [0, 1]
+        description: 1 when the flux is streaming
+      stream_url:
+        type: string
+        description: url of the stream
+      stream_format:
+        type: string
+        description: format of the stream (ex. mp3)
+      stream_bitrate:
+        type: string
+        description: stream bitrate
+      stream_sampling_frequency:
+        type: string
+        description: stream frequency
+      stream_encoding_profile:
+        type: string
+        description: encoding profile of the stream (ex, VBR)
+      extern_id:
+        type: string
+        description: tag id on your plateform
+      site_id:
+        type: integer
+        description: site id on which the tasg depends
+      network_id:
+        type: integer
+        description: network id on which the tasg depends
+      status:
+        <<: *STATUS
+      content_category_id:
+        type: integer
+        description: id of the categorie
+      content_category_label:
+        type: integer
+        description: label of the categorie
+  AdSize:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: id of the size
+      width:
+        type: integer
+        description: ads width
+      height:
+        type: integer
+        description: ads height
+      label:
+        type: string
+        description: ad label
+  ContentCategories:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: id of the catgeory (to use on forms)
+      name:
+        type: string
+        description: category name
+      tier:
+        type: string
+        description: iab category tier
+      subcategory:
+        type: string
+        description: not implemented (will be null)
+  Error:
+    type: object
+    properties:
+      name:
+        type: string
+        description: error name
+      message: 
+        type: string
+        description: error description
+      code:
+        type: integer
+        description: error code
+      status:
+        type: integer
+        description: http status
+  Report:
+    type: object
+    properties:
+      calls: 
+        type: integer
+      impressions: 
+        type: integer
+      firstquartiles:
+        type: integer
+      midpoints:
+        type: integer
+      thirdquartiles:
+        type: integer
+      completes:
+        type: integer
+      revenue:
+        type: number
+      fillRate:
+        type: number
+      ltr: 
+        type: number
+      cpm:
+        type: number
+        
+paths:
+  /user/auth:
+    post:
+      tags:
+        - User
+      operationId: sign-in
+      summary: generates a jwt token to log in
+      produces: 
+        - application/json
+      parameters:
+        - in: body
+          name: auth object
+          description: The user to log in.
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: login success
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: logged user id
+              auth_token:
+                type: string
+                description: jwt token of the created user
+              network_id:
+                type: integer
+                description: network associated to the user
+              account_id:
+                type: integer
+                description: main account id
+              accounts:
+                type: array
+                items: 
+                  $ref: '#/definitions/Account'
+              first_name:
+                type: string
+                description: logged user first name
+              last_name:
+                type: string
+                description: logged user last name
+              email: 
+                type: string
+                description: logged user email
+              status:
+                type: integer
+                description: user status where 10 = enabled and 0 disabled
+              role:
+                type: string
+                description: user role,
+              is_soundcast: 
+                type: integer
+                description: flag for soundcast employee
+              created_at:
+                type: integer
+                description: user creation date UNIX TIMESTAMP
+              updated_at:
+                type: integer
+                description: user last upadte date UNIX TIMESTAMP
+        401:
+          description: log in failure
+          schema:
+            $ref: '#/definitions/Error'
+  /networks:
+    get:
+      operationId: network-list
+      tags:
+        - network
+      summary: get a list of networks
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: per-page
+          required: false
+          description: number of row per pages to display
+        - in: query
+          type: string
+          name: page
+          required: false
+          description: number of the page
+      responses:
+        200:
+          description: list of availlable networks
+          schema:
+            type: object
+            properties:
+              items_count:
+                type: integer
+                description: number of items in total
+              pages_count:
+                type: integer
+                description: number of pages in total
+              items:
+                type: array
+                items: 
+                  $ref: '#/definitions/Network'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      operationId: network-post
+      tags:
+        - network
+      summary: create a new network
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: body
+          name: network
+          required: true
+          description: Object representing a network
+          schema:
+            $ref: '#/definitions/NetworkInput'
+      responses:
+        200:
+          description: created networks
+          schema:
+            $ref: '#/definitions/Network'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      operationId: network-put
+      tags:
+        - network
+      summary: updates a network
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: Id of the network to update
+          required: true
+        - in: body
+          name: network
+          required: true
+          description: Object representing a network
+          schema:
+            $ref: '#/definitions/NetworkInput'
+      responses:
+        200:
+          description: updated networks
+          schema:
+            $ref: '#/definitions/Network'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/Error'
+  /networks/{id}:
+    get:
+      operationId: network-get
+      tags:
+        - network
+      summary: get a networks
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: path
+          type: integer
+          name: id
+          required: true
+          description: id of the network
+      responses:
+        200:
+          description: network in json
+          schema:
+            $ref: '#/definitions/Network'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+  /sites:
+    get:
+      operationId: site-list
+      tags:
+        - sites
+      summary: get a list of sites
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: per-page
+          required: false
+          description: number of row per pages to display
+        - in: query
+          type: string
+          name: page
+          required: false
+          description: number of the page
+      responses:
+        200:
+          description: list of availlable sites
+          schema:
+            type: object
+            properties:
+              items_count:
+                type: integer
+                description: number of items in total
+              pages_count:
+                type: integer
+                description: number of pages in total
+              items:
+                type: array
+                items: 
+                  $ref: '#/definitions/Site'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      operationId: site-post
+      tags:
+        - sites
+      summary: create a new network
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: body
+          name: site
+          required: true
+          description: Object representing a site
+          schema:
+            $ref: '#/definitions/SiteInput'
+      responses:
+        200:
+          description: newly created site
+          schema:
+            $ref: '#/definitions/Site'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      operationId: site-put
+      tags:
+        - sites
+      summary: updates a network
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: Id of the site to update
+          required: true
+        - in: body
+          name: tag
+          required: true
+          description: Object representing a site
+          schema:
+            $ref: '#/definitions/SiteInput'
+      responses:
+        200:
+          description: list of availlable networks
+          schema:
+            $ref: '#/definitions/Site'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/Error'
+  /sites/{id}:
+    get:
+      operationId: sites-get
+      tags:
+        - sites
+      summary: get a site
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: path
+          type: integer
+          name: id
+          required: true
+          description: id of the site
+      responses:
+        200:
+          description: site in json
+          schema:
+            $ref: '#/definitions/Site'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+  /tags:
+    get:
+      operationId: tag-list
+      tags:
+        - Tag
+      summary: get a list of tags
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: per-page
+          required: false
+          description: number of row per pages to display
+        - in: query
+          type: string
+          name: page
+          required: false
+          description: number of the page
+        - in: query
+          type: string
+          name: site_id
+          required: false
+          description: filters the results with the site_id
+        - in: query
+          type: string
+          name: network_id
+          required: false
+          description: filters the results with the network_id
+      responses:
+        200:
+          description: list of availlable tags
+          schema:
+            type: object
+            properties:
+              items_count:
+                type: integer
+                description: number of items in total
+              pages_count:
+                type: integer
+                description: number of pages in total
+              items:
+                type: array
+                items: 
+                  $ref: '#/definitions/Tag'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      operationId: tag-post
+      tags:
+        - Tag
+      summary: create a new tags
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: body
+          name: tag
+          required: true
+          description: Object representing a tag
+          schema:
+            $ref: '#/definitions/TagInput'
+      responses:
+        200:
+          description: list of available tags
+          schema:
+            type: object
+            properties:
+              items_count:
+                type: integer
+                description: number of items in total
+              pages_count:
+                type: integer
+                description: number of pages in total
+              items:
+                type: array
+                items: 
+                  $ref: '#/definitions/Tag'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      operationId: tag-put
+      tags:
+        - Tag
+      summary: updates tags
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: Id of the tag to update
+          required: true
+        - in: body
+          name: tag
+          required: true
+          description: Object representing a tag
+          schema:
+            $ref: '#/definitions/TagInput'
+      responses:
+        200:
+          description: list of availlable tags
+          schema:
+            type: object
+            properties:
+              items_count:
+                type: integer
+                description: number of items in total
+              pages_count:
+                type: integer
+                description: number of pages in total
+              items:
+                type: array
+                items: 
+                  $ref: '#/definitions/Tag'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/Error'
+  /tags/{id}:
+    get:
+      operationId: tag-get
+      tags:
+        - Tag
+      summary: get tag
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: path
+          type: integer
+          name: id
+          required: true
+          description: id of the tag
+      responses:
+        200:
+          description: tag in json
+          schema:
+            $ref: '#/definitions/Tag'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+  /report:
+    get:
+      operationId: report
+      tags:
+        - analytics
+      summary: get reports
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: per-page
+          required: false
+          description: number of row per pages to display
+        - in: query
+          type: string
+          name: page
+          required: false
+          description: number of the page
+        - in: query
+          type: string
+          name: group_by
+          required: false
+          description: fields to display separated by a double pipe (||)
+        - in: query
+          type: integer
+          name: start_date
+          required: false
+          description: UNIX TIMESTAMP of the start date of the date range
+        - in: query
+          type: integer
+          name: end_date
+          required: false
+          description: UNIX TIMESTAMP of the end date of the date range
+        - in: query
+          type: integer
+          name: timezone
+          required: false
+          description: timezone number (1 for France)
+      responses:
+        200:
+          description: list of data the items can change as when adding group_by column that are added to Report object
+          schema:
+            type: object
+            properties:
+              pages_count:
+                type: integer
+                description: number of pages in total
+              items:
+                type: array
+                items: 
+                  $ref: '#/definitions/Report'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal error
+          schema:
+            $ref: '#/definitions/Error'
+  /content-categories:
+    get:
+      operationId: content-categories
+      tags:
+        - content-categories
+      summary: get a list of content-categories
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: per-page
+          required: false
+          description: number of row per pages to display
+        - in: query
+          type: string
+          name: page
+          required: false
+          description: number of the page
+        - in: query
+          type: string
+          name: tier
+          required: false
+          description: filter the results per tier
+      responses:
+        200:
+          description: list of availlable content-categories
+          schema:
+            type: object
+            properties:
+              pages_count:
+                type: integer
+                description: number of pages in total
+              items:
+                type: array
+                items: 
+                  $ref: '#/definitions/ContentCategories'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal error
+          schema:
+            $ref: '#/definitions/Error'          
+  /ad-sizes:
+    get:
+      operationId: ad-sizes
+      tags:
+        - ad size
+      summary: get a list of ads size
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: per-page
+          required: false
+          description: number of row per pages to display
+        - in: query
+          type: string
+          name: page
+          required: false
+          description: number of the page
+      responses:
+        200:
+          description: list of availlable ads size
+          schema:
+            type: object
+            properties:
+              pages_count:
+                type: integer
+                description: number of pages in total
+              items:
+                type: array
+                items: 
+                  $ref: '#/definitions/AdSize'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal error
+          schema:
+            $ref: '#/definitions/Error'
+  
+
+          
