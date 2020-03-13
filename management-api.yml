@@ -576,6 +576,21 @@ paths:
           name: page
           required: false
           description: number of the page
+        - in: query
+          type: string
+          name: name
+          required: false
+          description: part of the network name to filter the resultset
+        - in: query
+          type: string
+          name: account_id
+          required: false
+          description: account_id owning the networks to display. Can be multiple ids separated by comma
+        - in: query
+          type: integer
+          name: status
+          required: false
+          description: status to filter.
       responses:
         200:
           description: list of availlable networks
@@ -729,6 +744,21 @@ paths:
           name: page
           required: false
           description: number of the page
+        - in: query
+          type: string
+          name: name
+          required: false
+          description: part of the site name to filter the resultset
+        - in: query
+          type: string
+          name: network_id
+          required: false
+          description: id of network owning the networks to display.
+        - in: query
+          type: integer
+          name: status
+          required: false
+          description: status to filter.
       responses:
         200:
           description: list of availlable sites
@@ -889,9 +919,14 @@ paths:
           description: filters the results with the site_id
         - in: query
           type: string
-          name: network_id
+          name: name
           required: false
-          description: filters the results with the network_id
+          description: filters the results with the name
+        - in: query
+          type: string
+          name: content_category_id
+          required: false
+          description: filters the results with the content_category_id. Refer to /content-categories
       responses:
         200:
           description: list of availlable tags
@@ -1202,37 +1237,37 @@ paths:
           type: string
           name: campaign_ids
           required: false
-          description: campaign ids separated by a coma to filter the results set
+          description: campaign ids separated by a coma to filter the results set. Refer to /campaigns path to get those ids.
         - in: query
           type: string
           name: network_ids
           required: false
-          description: network ids separated by a coma to filter the results set
+          description: network ids separated by a coma to filter the results set. Refer to /networks path to get those ids.
         - in: query
           type: string
           name: site_ids
           required: false
-          description: site ids separated by a coma to filter the results set
+          description: site ids separated by a coma to filter the results set. Refer to /sites path to get those ids.
         - in: query
           type: string
           name: tag_ids
           required: false
-          description: tag ids separated by a coma to filter the results set
+          description: tag ids separated by a coma to filter the results set. Refer to /tags path to get those ids.
         - in: query
           type: string
           name: department_ids
           required: false
-          description: department ids separated by a coma to filter the results set
+          description: department ids separated by a coma to filter the results set Refer to /departements path to get those ids.
         - in: query
           type: string
           name: region_ids
           required: false
-          description: region ids separated by a coma to filter the results set
+          description: region ids separated by a coma to filter the results set those. Refer to /regions path to get those ids.
         - in: query
           type: string
           name: country_ids
           required: false
-          description: country ids separated by a coma to filter the results set
+          description: country ids separated by a coma to filter the results set. Refer to /countries path to get those ids.
         - in: query
           type: integer
           name: timezone
