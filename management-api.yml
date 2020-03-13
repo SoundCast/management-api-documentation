@@ -43,6 +43,38 @@ definitions:
       logo:
         type: string
         description: url of the account logo
+  User: 
+    type: object
+    properties:
+      id:
+        type: integer
+      account_id:
+        type: string
+        description: Account owning the user
+      account_list:
+        type: array
+        items:
+          $ref: '#/definitions/Account'
+      first_name:
+        type: string
+        description: user first name
+      last_name:
+        type: string
+        description: user last name
+      email:
+        type: string
+        description: user email
+      status:
+        <<: *STATUS
+      role:
+        type: string
+        description: user role
+      created_at:
+        type: integer
+        description: user creation date
+      updated_at:
+        type: integer
+        description: user update date
   Network:
     type: object
     properties:
@@ -360,7 +392,96 @@ definitions:
         type: number
       cpm:
         type: number
-        
+  Country:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: country id
+      name:
+        type: string
+        description: country name
+      code: 
+        type: string
+        description: ISO2 code
+  Region:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: region id
+      name:
+        type: string
+        description: region name
+      code: 
+        type: string
+        description: zipcode first digits
+  Department:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: department id
+      name:
+        type: string
+        description: department name
+      code: 
+        type: string
+        description: ISO3 code
+  Advertiser:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+        description: Advertiser name
+      businessCategory:
+        $ref: '#/definitions/ContentCategories'
+      account_id:
+        type: integer
+        description: Account owning the advertiser
+      status:
+        <<: *STATUS
+      extern_id:
+        type: integer
+        description: extern id
+  Campaign:
+    type: object
+    properties:
+      id:
+        type: integer
+      account_id:
+        type: integer
+        description: Id of the account owning the campaign
+      name:
+        type: string
+        description: name of the campaign
+      advertiser:
+        $ref: '#/definitions/Advertiser'
+      salesperson:
+        $ref: '#/definitions/User'
+      price:
+        type: number
+        description: budget on the campaign
+      status:
+        <<: *STATUS
+      start_datetime:
+        type: integer
+        description: start date UNIX TIMESTAMP
+      end_datetime:
+        type: integer
+        description: end date UNIX TIMESTAMP
+      maxVolume:
+        type: integer
+        description: Maximum impression to deliver
+      account_list:
+        type: array
+        items:
+          $ref: '#/definitions/Account'
+        description: accounts allowed do access the campaign
+           
+
 paths:
   /user/auth:
     post:
@@ -925,6 +1046,122 @@ paths:
           description: Not Allowed
           schema:
             $ref: '#/definitions/Error'
+  /countries:
+    get:
+      operationId: countries-list
+      tags:
+        - countries
+      summary: get a list of countries
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      responses:
+        200:
+          description: list of availlable countries
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/Country'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+  /regions:
+    get:
+      operationId: regions-list
+      tags:
+        - regions
+      summary: get a list of regions
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      responses:
+        200:
+          description: list of availlable regions
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/Region'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+  /departements:
+    get:
+      operationId: departments-list
+      tags:
+        - departments
+      summary: get a list of departments
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      responses:
+        200:
+          description: list of availlable regions
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/Department'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+  /campaigns:
+    get:
+      operationId: campaigns-list
+      tags:
+        - campaigns
+      summary: get a list of campaigns
+      security:
+        - Bearer: []
+      produces: 
+        - application/json
+      responses:
+        200:
+          description: list of availlable campaigns
+          schema:
+            type: array
+            items: 
+              $ref: '#/definitions/Campaign'
+        401:
+          description: Not Authenticated
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Not Allowed
+          schema:
+            $ref: '#/definitions/Error'
   /report:
     get:
       operationId: report
@@ -949,18 +1186,53 @@ paths:
         - in: query
           type: string
           name: group_by
-          required: false
+          required: true
           description: fields to display separated by a double pipe (||)
         - in: query
           type: integer
           name: start_date
-          required: false
+          required: true
           description: UNIX TIMESTAMP of the start date of the date range
         - in: query
           type: integer
           name: end_date
-          required: false
+          required: true
           description: UNIX TIMESTAMP of the end date of the date range
+        - in: query
+          type: string
+          name: campaign_ids
+          required: false
+          description: campaign ids separated by a coma to filter the results set
+        - in: query
+          type: string
+          name: network_ids
+          required: false
+          description: network ids separated by a coma to filter the results set
+        - in: query
+          type: string
+          name: site_ids
+          required: false
+          description: site ids separated by a coma to filter the results set
+        - in: query
+          type: string
+          name: tag_ids
+          required: false
+          description: tag ids separated by a coma to filter the results set
+        - in: query
+          type: string
+          name: department_ids
+          required: false
+          description: department ids separated by a coma to filter the results set
+        - in: query
+          type: string
+          name: region_ids
+          required: false
+          description: region ids separated by a coma to filter the results set
+        - in: query
+          type: string
+          name: country_ids
+          required: false
+          description: country ids separated by a coma to filter the results set
         - in: query
           type: integer
           name: timezone
@@ -1088,6 +1360,3 @@ paths:
           description: Internal error
           schema:
             $ref: '#/definitions/Error'
-  
-
-          
