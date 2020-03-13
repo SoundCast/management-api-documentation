@@ -6,6 +6,12 @@ In this repository, you will find indications on how to use that API as well as 
 
 To use this API you need a SoundCast user account. If you don't have an account yet, contact the SoundCast team.
 
+## Pagination
+
+Listing routes supports query parameter to paginate through the results. Those parameters are:
+`page=x` to display the page `x` 
+`per-page=x` to display x row per page
+
 ## Authentication
 
 To authenticate, use the `/user/auth` path to get a JWT token.
@@ -36,3 +42,16 @@ You can find the supported values in the table below.
 | networkId | add networks |
 | siteId | add sites |
 | tagId | add tags |
+
+### Getting Ids
+
+Reports path offers filters which uses IDs. They can be retrieved by using the following paths.
+
+| path | data |
+| ---- | ---- |
+| /countries | country list |
+| /regions | region list |
+| /departements | department list |
+| /networks | network list |
+| /sites | site list |
+| /tags | tag list |
